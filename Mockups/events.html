@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Configuration - Reminder System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+    <div id="app" class="flex min-h-screen">
+        <!-- Sidebar -->
+        <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-64 bg-gray-800 text-white transform -translate-x-full md:translate-x-0 transition-transform duration-200">
+            <div class="p-4 border-b border-gray-700">
+                <h1 class="text-xl font-bold">Reminder System</h1>
+                <p class="text-sm text-gray-400" id="userEmail">admin@company.com</p>
+            </div>
+            <nav class="py-2">
+                <a href="dashboard.html" class="block px-4 py-2 hover:bg-gray-700">Dashboard</a>
+                <a href="employees.html" class="block px-4 py-2 hover:bg-gray-700">Employees</a>
+                <a href="bulk-upload.html" class="block px-4 py-2 hover:bg-gray-700">Bulk Upload</a>
+                <a href="events.html" class="block px-4 py-2 hover:bg-gray-700 bg-gray-700">Event Config</a>
+                <a href="templates.html" class="block px-4 py-2 hover:bg-gray-700">Templates</a>
+                <a href="reports.html" class="block px-4 py-2 hover:bg-gray-700">Reports</a>
+                <a href="reminder-logs.html" class="block px-4 py-2 hover:bg-gray-700">Reminder Logs</a>
+                <a href="settings.html" class="block px-4 py-2 hover:bg-gray-700">Settings</a>
+                <button onclick="logout()" class="block w-full text-left px-4 py-2 hover:bg-gray-700">Logout</button>
+            </nav>
+        </aside>
+
+        <!-- Mobile Menu Button -->
+        <div class="md:hidden fixed top-0 left-0 right-0 z-30 bg-gray-100 border-b border-gray-200">
+            <div class="px-4 py-3 flex items-center gap-3">
+                <button onclick="toggleSidebar()" class="inline-flex items-center justify-center rounded-md bg-gray-800 text-white px-3 py-2 hover:bg-gray-700">
+                    ☰
+                </button>
+                <div class="min-w-0">
+                    <div class="text-sm font-semibold text-gray-900">Reminder System</div>
+                    <div class="text-xs text-gray-600" id="mobileUserEmail">admin@company.com</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <main class="flex-1 md:ml-64 min-h-screen pt-12 md:pt-0">
+            <div class="p-4 sm:p-6 lg:p-8">
+                <h1 class="text-2xl sm:text-3xl font-bold mb-6">Event Configuration</h1>
+
+                <div class="space-y-4 sm:space-y-6">
+                    <!-- Birthday Event -->
+                    <div class="bg-white p-4 sm:p-6 rounded-lg shadow">
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
+                            <h2 class="text-lg sm:text-xl font-bold">Birthday</h2>
+                            <label class="flex items-center">
+                                <input type="checkbox" checked class="mr-2" />
+                                Enable
+                            </label>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium mb-2">Channels</label>
+                            <div class="flex flex-wrap gap-3 sm:gap-4">
+                                <label class="flex items-center"><input type="checkbox" checked class="mr-2" />Email</label>
+                                <label class="flex items-center"><input type="checkbox" class="mr-2" />WhatsApp</label>
+                                <label class="flex items-center"><input type="checkbox" class="mr-2" />SMS</label>
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium mb-2">Reminder Days</label>
+                            <div class="flex flex-wrap gap-3 sm:gap-4">
+                                <label class="flex items-center"><input type="checkbox" checked class="mr-2" /><span class="text-sm">Same Day</span></label>
+                                <label class="flex items-center"><input type="checkbox" class="mr-2" /><span class="text-sm">1 Day Before</span></label>
+                                <label class="flex items-center"><input type="checkbox" class="mr-2" /><span class="text-sm">2 Days Before</span></label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Anniversary Event -->
+                    <div class="bg-white p-4 sm:p-6 rounded-lg shadow">
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
+                            <h2 class="text-lg sm:text-xl font-bold">Job Anniversary</h2>
+                            <label class="flex items-center">
+                                <input type="checkbox" checked class="mr-2" />
+                                Enable
+                            </label>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium mb-2">Channels</label>
+                            <div class="flex flex-wrap gap-3 sm:gap-4">
+                                <label class="flex items-center"><input type="checkbox" checked class="mr-2" />Email</label>
+                                <label class="flex items-center"><input type="checkbox" class="mr-2" />WhatsApp</label>
+                                <label class="flex items-center"><input type="checkbox" class="mr-2" />SMS</label>
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium mb-2">Reminder Days</label>
+                            <div class="flex flex-wrap gap-3 sm:gap-4">
+                                <label class="flex items-center"><input type="checkbox" checked class="mr-2" /><span class="text-sm">Same Day</span></label>
+                                <label class="flex items-center"><input type="checkbox" class="mr-2" /><span class="text-sm">1 Day Before</span></label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Festival Event -->
+                    <div class="bg-white p-4 sm:p-6 rounded-lg shadow">
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
+                            <h2 class="text-lg sm:text-xl font-bold">Festival</h2>
+                            <label class="flex items-center">
+                                <input type="checkbox" checked class="mr-2" />
+                                Enable
+                            </label>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium mb-2">Channels</label>
+                            <div class="flex flex-wrap gap-3 sm:gap-4">
+                                <label class="flex items-center"><input type="checkbox" checked class="mr-2" />Email</label>
+                                <label class="flex items-center"><input type="checkbox" class="mr-2" />WhatsApp</label>
+                                <label class="flex items-center"><input type="checkbox" class="mr-2" />SMS</label>
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium mb-2">Reminder Days</label>
+                            <div class="flex flex-wrap gap-3 sm:gap-4">
+                                <label class="flex items-center"><input type="checkbox" checked class="mr-2" /><span class="text-sm">Same Day</span></label>
+                                <label class="flex items-center"><input type="checkbox" class="mr-2" /><span class="text-sm">1 Day Before</span></label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cron Job Information -->
+                <div class="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4 sm:p-6">
+                    <h2 class="text-lg sm:text-xl font-bold mb-4">Cron Job Configuration</h2>
+                    <div class="space-y-3 text-sm">
+                        <div class="flex items-start">
+                            <span class="font-semibold mr-2">Birthday Reminders:</span>
+                            <span>Runs every 15 minutes to check for birthdays today</span>
+                        </div>
+                        <div class="flex items-start">
+                            <span class="font-semibold mr-2">Work Anniversary Reminders:</span>
+                            <span>Runs every 15 minutes to check for anniversaries today</span>
+                        </div>
+                        <div class="flex items-start">
+                            <span class="font-semibold mr-2">Festival Reminders:</span>
+                            <span>Runs every 15 minutes to check for festivals today</span>
+                        </div>
+                        <div class="mt-4 pt-4 border-t border-blue-300">
+                            <p class="text-xs text-blue-800">
+                                <strong>Note:</strong> Each event type has a separate cron job. 
+                                Reminders are sent only if the reminder date matches today. 
+                                Timezone can be configured via TZ environment variable.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Mobile Overlay -->
+        <div id="overlay" class="fixed inset-0 z-40 bg-black/40 md:hidden hidden" onclick="toggleSidebar()"></div>
+    </div>
+
+    <script>
+        // No authentication check - all pages accessible
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        document.getElementById('userEmail').textContent = user.email || 'admin@company.com';
+        document.getElementById('mobileUserEmail').textContent = user.email || 'admin@company.com';
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('overlay');
+            sidebar.classList.toggle('-translate-x-full');
+            overlay.classList.toggle('hidden');
+        }
+
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+</html>

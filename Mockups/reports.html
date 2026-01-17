@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reports - Reminder System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+    <div id="app" class="flex min-h-screen">
+        <!-- Sidebar -->
+        <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-64 bg-gray-800 text-white transform -translate-x-full md:translate-x-0 transition-transform duration-200">
+            <div class="p-4 border-b border-gray-700">
+                <h1 class="text-xl font-bold">Reminder System</h1>
+                <p class="text-sm text-gray-400" id="userEmail">admin@company.com</p>
+            </div>
+            <nav class="py-2">
+                <a href="dashboard.html" class="block px-4 py-2 hover:bg-gray-700">Dashboard</a>
+                <a href="employees.html" class="block px-4 py-2 hover:bg-gray-700">Employees</a>
+                <a href="bulk-upload.html" class="block px-4 py-2 hover:bg-gray-700">Bulk Upload</a>
+                <a href="events.html" class="block px-4 py-2 hover:bg-gray-700">Event Config</a>
+                <a href="templates.html" class="block px-4 py-2 hover:bg-gray-700">Templates</a>
+                <a href="reports.html" class="block px-4 py-2 hover:bg-gray-700 bg-gray-700">Reports</a>
+                <a href="reminder-logs.html" class="block px-4 py-2 hover:bg-gray-700">Reminder Logs</a>
+                <a href="settings.html" class="block px-4 py-2 hover:bg-gray-700">Settings</a>
+                <button onclick="logout()" class="block w-full text-left px-4 py-2 hover:bg-gray-700">Logout</button>
+            </nav>
+        </aside>
+
+        <!-- Mobile Menu Button -->
+        <div class="md:hidden fixed top-0 left-0 right-0 z-30 bg-gray-100 border-b border-gray-200">
+            <div class="px-4 py-3 flex items-center gap-3">
+                <button onclick="toggleSidebar()" class="inline-flex items-center justify-center rounded-md bg-gray-800 text-white px-3 py-2 hover:bg-gray-700">
+                    ☰
+                </button>
+                <div class="min-w-0">
+                    <div class="text-sm font-semibold text-gray-900">Reminder System</div>
+                    <div class="text-xs text-gray-600" id="mobileUserEmail">admin@company.com</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <main class="flex-1 md:ml-64 min-h-screen pt-12 md:pt-0">
+            <div class="p-4 sm:p-6 lg:p-8">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+                    <h1 class="text-2xl sm:text-3xl font-bold">Reports</h1>
+                    <button onclick="exportCSV()" class="w-full sm:w-auto bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700">
+                        Export CSV
+                    </button>
+                </div>
+
+                <div class="bg-white p-4 sm:p-6 rounded-lg shadow mb-6">
+                    <h2 class="text-lg sm:text-xl font-bold mb-4">Filters</h2>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Start Date</label>
+                            <input type="date" id="startDate" class="w-full px-3 py-2 border rounded-md" />
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1">End Date</label>
+                            <input type="date" id="endDate" class="w-full px-3 py-2 border rounded-md" />
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Event Type</label>
+                            <select id="eventType" class="w-full px-3 py-2 border rounded-md">
+                                <option value="">All</option>
+                                <option value="Birthday">Birthday</option>
+                                <option value="JobAnniversary">Job Anniversary</option>
+                                <option value="Festival">Festival</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Channel</label>
+                            <select id="channel" class="w-full px-3 py-2 border rounded-md">
+                                <option value="">All</option>
+                                <option value="Email">Email</option>
+                                <option value="WhatsApp">WhatsApp</option>
+                                <option value="SMS">SMS</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Status</label>
+                            <select id="status" class="w-full px-3 py-2 border rounded-md">
+                                <option value="">All</option>
+                                <option value="Success">Success</option>
+                                <option value="Failed">Failed</option>
+                                <option value="Pending">Pending</option>
+                            </select>
+                        </div>
+                        <div class="flex items-end">
+                            <button onclick="searchReports()" class="w-full bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
+                                Search
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-lg shadow overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Employee</th>
+                                <th class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Event Type</th>
+                                <th class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase hidden sm:table-cell">Channel</th>
+                                <th class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                                <th class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase hidden md:table-cell">Sent At</th>
+                                <th class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase hidden lg:table-cell">Response</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            <tr>
+                                <td class="px-3 sm:px-6 py-4 whitespace-nowrap text-sm">John Doe</td>
+                                <td class="px-3 sm:px-6 py-4 whitespace-nowrap text-sm">Birthday</td>
+                                <td class="px-3 sm:px-6 py-4 whitespace-nowrap text-sm hidden sm:table-cell">Email</td>
+                                <td class="px-3 sm:px-6 py-4 whitespace-nowrap">
+                                    <span class="px-2 py-1 text-xs rounded bg-green-100 text-green-800">Success</span>
+                                </td>
+                                <td class="px-3 sm:px-6 py-4 whitespace-nowrap text-sm hidden md:table-cell">2024-01-15 09:00</td>
+                                <td class="px-3 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-600 hidden lg:table-cell">Sent</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                <div class="mt-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+                    <div class="text-sm text-gray-600">
+                        Showing <span>1-50</span> of <span>1250</span> reports
+                    </div>
+                    <div class="flex gap-2">
+                        <button class="px-4 py-2 border rounded-md hover:bg-gray-50" disabled>Previous</button>
+                        <span class="px-4 py-2 text-sm">Page 1 of 25</span>
+                        <button class="px-4 py-2 border rounded-md hover:bg-gray-50">Next</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Mobile Overlay -->
+        <div id="overlay" class="fixed inset-0 z-40 bg-black/40 md:hidden hidden" onclick="toggleSidebar()"></div>
+    </div>
+
+    <script>
+        // No authentication check - all pages accessible
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        document.getElementById('userEmail').textContent = user.email || 'admin@company.com';
+        document.getElementById('mobileUserEmail').textContent = user.email || 'admin@company.com';
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('overlay');
+            sidebar.classList.toggle('-translate-x-full');
+            overlay.classList.toggle('hidden');
+        }
+
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = 'index.html';
+        }
+
+        function searchReports() {
+            alert('Searching reports... (Demo)');
+        }
+
+        function exportCSV() {
+            alert('Exporting CSV... (Demo)');
+        }
+    </script>
+</body>
+</html>

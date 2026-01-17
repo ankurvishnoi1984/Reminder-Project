@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bulk Upload - Reminder System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+    <div id="app" class="flex min-h-screen">
+        <!-- Sidebar -->
+        <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-64 bg-gray-800 text-white transform -translate-x-full md:translate-x-0 transition-transform duration-200">
+            <div class="p-4 border-b border-gray-700">
+                <h1 class="text-xl font-bold">Reminder System</h1>
+                <p class="text-sm text-gray-400" id="userEmail">admin@company.com</p>
+            </div>
+            <nav class="py-2">
+                <a href="dashboard.html" class="block px-4 py-2 hover:bg-gray-700">Dashboard</a>
+                <a href="employees.html" class="block px-4 py-2 hover:bg-gray-700">Employees</a>
+                <a href="bulk-upload.html" class="block px-4 py-2 hover:bg-gray-700 bg-gray-700">Bulk Upload</a>
+                <a href="events.html" class="block px-4 py-2 hover:bg-gray-700">Event Config</a>
+                <a href="templates.html" class="block px-4 py-2 hover:bg-gray-700">Templates</a>
+                <a href="reports.html" class="block px-4 py-2 hover:bg-gray-700">Reports</a>
+                <a href="reminder-logs.html" class="block px-4 py-2 hover:bg-gray-700">Reminder Logs</a>
+                <a href="settings.html" class="block px-4 py-2 hover:bg-gray-700">Settings</a>
+                <button onclick="logout()" class="block w-full text-left px-4 py-2 hover:bg-gray-700">Logout</button>
+            </nav>
+        </aside>
+
+        <!-- Mobile Menu Button -->
+        <div class="md:hidden fixed top-0 left-0 right-0 z-30 bg-gray-100 border-b border-gray-200">
+            <div class="px-4 py-3 flex items-center gap-3">
+                <button onclick="toggleSidebar()" class="inline-flex items-center justify-center rounded-md bg-gray-800 text-white px-3 py-2 hover:bg-gray-700">
+                    ☰
+                </button>
+                <div class="min-w-0">
+                    <div class="text-sm font-semibold text-gray-900">Reminder System</div>
+                    <div class="text-xs text-gray-600" id="mobileUserEmail">admin@company.com</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <main class="flex-1 md:ml-64 min-h-screen pt-12 md:pt-0">
+            <div class="p-4 sm:p-6 lg:p-8">
+                <h1 class="text-2xl sm:text-3xl font-bold mb-6">Bulk Upload</h1>
+
+                <div class="bg-white p-4 sm:p-6 rounded-lg shadow mb-6">
+                    <h2 class="text-lg sm:text-xl font-bold mb-4">Upload Employees</h2>
+                    <div class="mb-4 space-y-4">
+                        <div>
+                            <input type="file" accept=".csv,.xlsx,.xls" id="fileInput" class="w-full text-sm sm:text-base" />
+                        </div>
+                        <button onclick="uploadFile()" class="w-full sm:w-auto bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
+                            Upload
+                        </button>
+                    </div>
+                    <div id="uploadResult" class="hidden mt-4 p-4 bg-gray-50 rounded">
+                        <h3 class="font-bold mb-2">Upload Results:</h3>
+                        <div class="space-y-1 text-sm">
+                            <p>Total: <span id="totalRecords">0</span></p>
+                            <p class="text-green-600">Success: <span id="successCount">0</span></p>
+                            <p class="text-red-600">Failed: <span id="failureCount">0</span></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white p-4 sm:p-6 rounded-lg shadow overflow-x-auto">
+                    <h2 class="text-lg sm:text-xl font-bold mb-4">Upload History</h2>
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">File Name</th>
+                                <th class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total</th>
+                                <th class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Success</th>
+                                <th class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Failed</th>
+                                <th class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase hidden sm:table-cell">Status</th>
+                                <th class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            <tr>
+                                <td class="px-3 sm:px-6 py-4 whitespace-nowrap text-sm">employees.csv</td>
+                                <td class="px-3 sm:px-6 py-4 whitespace-nowrap text-sm">50</td>
+                                <td class="px-3 sm:px-6 py-4 whitespace-nowrap text-sm text-green-600">48</td>
+                                <td class="px-3 sm:px-6 py-4 whitespace-nowrap text-sm text-red-600">2</td>
+                                <td class="px-3 sm:px-6 py-4 whitespace-nowrap text-sm hidden sm:table-cell">Completed</td>
+                                <td class="px-3 sm:px-6 py-4 whitespace-nowrap text-sm">2024-01-15</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+
+        <!-- Mobile Overlay -->
+        <div id="overlay" class="fixed inset-0 z-40 bg-black/40 md:hidden hidden" onclick="toggleSidebar()"></div>
+    </div>
+
+    <script>
+        // No authentication check - all pages accessible
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        document.getElementById('userEmail').textContent = user.email || 'admin@company.com';
+        document.getElementById('mobileUserEmail').textContent = user.email || 'admin@company.com';
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('overlay');
+            sidebar.classList.toggle('-translate-x-full');
+            overlay.classList.toggle('hidden');
+        }
+
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = 'index.html';
+        }
+
+        function uploadFile() {
+            const fileInput = document.getElementById('fileInput');
+            if (!fileInput.files[0]) {
+                alert('Please select a file');
+                return;
+            }
+            
+            // Simulate upload
+            document.getElementById('uploadResult').classList.remove('hidden');
+            document.getElementById('totalRecords').textContent = '50';
+            document.getElementById('successCount').textContent = '48';
+            document.getElementById('failureCount').textContent = '2';
+            alert('Upload completed! (Demo)');
+        }
+    </script>
+</body>
+</html>

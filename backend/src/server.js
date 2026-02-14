@@ -28,6 +28,10 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Routes
+// Health check
+app.get('/health', (req, res) => {
+  res.json({ status: 'OK', timestamp: new Date().toISOString() });
+});
 app.use('/api', routes);
 
 // 404 handler - must be after all routes
@@ -36,10 +40,6 @@ app.use(notFoundHandler);
 // Global error handler - must be last
 app.use(errorHandler);
 
-// Health check
-app.get('/health', (req, res) => {
-  res.json({ status: 'OK', timestamp: new Date().toISOString() });
-});
 
 // Initialize services
 initializeEmailService();

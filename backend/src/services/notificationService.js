@@ -10,20 +10,24 @@ const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
 const replacePlaceholders = (template, employee, eventData = {}) => {
   let message = template.body;
-  const subject = template.subject ? template.subject.replace(/{EmployeeName}/g, employee.fullName) : '';
+  let subject = template.subject || '';
 
+  // Common replacements
+  subject = subject.replace(/{EmployeeName}/g, employee.fullName);
   message = message.replace(/{EmployeeName}/g, employee.fullName);
-  
+
   if (eventData.yearsCompleted !== undefined) {
+    subject = subject.replace(/{YearsCompleted}/g, eventData.yearsCompleted);
     message = message.replace(/{YearsCompleted}/g, eventData.yearsCompleted);
   }
-  
+
   if (eventData.festivalName) {
     message = message.replace(/{FestivalName}/g, eventData.festivalName);
   }
 
   return { subject, body: message };
 };
+
 
 // Get template with caching
 const getTemplate = async (eventType, channel) => {
@@ -220,16 +224,24 @@ const processAnniversaryReminders = async (event, today) => {
     for (const daysBefore of reminderDates) {
       const reminderDate = moment(anniversaryDate).subtract(daysBefore, 'days').format('YYYY-MM-DD');
 
+      console.log("REMINDER DATE, TODAY",reminderDate,today)
+
       if (reminderDate === today) {
+        console.log("REMINDER DATE'S TODAY")
         for (const channel of channelsToProcess) {
           const template = templates[channel];
           if (template) {
+            console.log("FOUND TEMPLATE")
             const eventData = { yearsCompleted };
             notificationPromises.push(
               sendNotification(employee, 'JobAnniversary', channel, template, eventData)
             );
+          }else{
+            console.log("TEMPLATE NOT FOUND")
           }
         }
+      }else{
+        console.log("NOW JOB ANNIVERSARY TODAY")
       }
     }
   }

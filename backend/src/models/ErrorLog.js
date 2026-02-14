@@ -1,7 +1,7 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
 
-const ErrorLog = sequelize.define('ErrorLog', {
+const ErrorLog = sequelize.define('ErrorLogs', {
   id: {
     type: DataTypes.INTEGER,
     primaryKey: true,

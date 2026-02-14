@@ -1,7 +1,7 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
 
-const BulkUploadLog = sequelize.define('BulkUploadLog', {
+const BulkUploadLog = sequelize.define('BulkUploadLogs', {
   id: {
     type: DataTypes.INTEGER,
     primaryKey: true,

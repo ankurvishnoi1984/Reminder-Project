@@ -1,7 +1,7 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
 
-const FestivalMaster = sequelize.define('FestivalMaster', {
+const FestivalMaster = sequelize.define('FestivalMasters', {
   id: {
     type: DataTypes.INTEGER,
     primaryKey: true,

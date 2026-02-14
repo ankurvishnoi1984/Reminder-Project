@@ -1,7 +1,7 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
 
-const Template = sequelize.define('Template', {
+const Template = sequelize.define('Templates', {
   id: {
     type: DataTypes.INTEGER,
     primaryKey: true,

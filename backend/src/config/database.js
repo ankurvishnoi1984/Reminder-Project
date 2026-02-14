@@ -28,7 +28,7 @@ const sequelize = new Sequelize(
       // Enable compression for better performance
       compress: true,
       // Additional performance options
-      dateStrings: false,
+      dateStrings: true,
       typeCast: true
     },
     // Query optimization
@@ -44,3 +44,54 @@ const sequelize = new Sequelize(
 );
 
 module.exports = sequelize;
+
+/*const baseConfig = {
+  username: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+  host: process.env.DB_HOST,
+  port: process.env.DB_PORT,
+  dialect: 'mysql',
+
+  pool: {
+    max: parseInt(process.env.DB_POOL_MAX) || 10,
+    min: parseInt(process.env.DB_POOL_MIN) || 2,
+    acquire: parseInt(process.env.DB_POOL_ACQUIRE) || 30000,
+    idle: parseInt(process.env.DB_POOL_IDLE) || 10000,
+    evict: parseInt(process.env.DB_POOL_EVICT) || 1000
+  },
+
+  retry: {
+    max: 3
+  },
+
+  dialectOptions: {
+    connectTimeout: 60000,
+    compress: true,
+    dateStrings: false,
+    typeCast: true
+  },
+
+  define: {
+    timestamps: true,
+    underscored: false,
+    freezeTableName: true
+  }
+};
+
+module.exports = {
+  development: {
+    ...baseConfig,
+    logging: console.log,
+    benchmark: true
+  },
+  test: {
+    ...baseConfig,
+    logging: false
+  },
+  production: {
+    ...baseConfig,
+    logging: false
+  }
+};*/
+

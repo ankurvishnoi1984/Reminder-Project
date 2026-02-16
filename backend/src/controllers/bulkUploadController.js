@@ -51,7 +51,8 @@ const uploadEmployees = async (req, res) => {
       total: employees.length,
       success: results.success,
       failed: results.failed,
-      errors: results.errors
+      errors: results.errors,
+      data:results.data
     });
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -80,46 +81,84 @@ const processEmployees = async (employees, uploadLogId) => {
   const results = {
     success: 0,
     failed: 0,
-    errors: []
+    errors: [],
+    data: [],
   };
 
   for (let i = 0; i < employees.length; i++) {
+    const rowNumber = i + 2; // Excel row number
+    const row = employees[i];
+
+    // Base response object for this row
+    const rowResult = {
+      ...row,
+      Status: "",
+      Remark: "",
+    };
+
     try {
-      const row = employees[i];
-      
-      // Validate required fields
-      if (!row.employeeId || !row.fullName || !row.email || !row.mobileNumber || 
-          !row.dateOfBirth || !row.dateOfJoining || !row.department) {
+      // ✅ Validate required fields
+      const requiredFields = [
+        "employeeId",
+        "fullName",
+        "email",
+        "mobileNumber",
+        "dateOfBirth",
+        "dateOfJoining",
+        "department",
+      ];
+
+      const missingFields = requiredFields.filter(
+        (field) => !row[field]
+      );
+
+      if (missingFields.length > 0) {
         results.failed++;
+
+        const errorMsg = `Missing required fields: ${missingFields.join(", ")}`;
+
         results.errors.push({
-          row: i + 2, // +2 for header and 0-index
-          employeeId: row.employeeId || 'N/A',
-          error: 'Missing required fields'
+          row: rowNumber,
+          employeeId: row.employeeId || "N/A",
+          error: errorMsg,
         });
+
+        rowResult.Status = "Failed";
+        rowResult.Remark = errorMsg;
+        results.data.push(rowResult);
+
         continue;
       }
 
-      // Check for duplicates
+      // ✅ Check for duplicates
       const existing = await Employee.findOne({
         where: {
           [Op.or]: [
             { employeeId: row.employeeId },
-            { email: row.email }
-          ]
-        }
+            { email: row.email },
+          ],
+        },
       });
 
       if (existing) {
         results.failed++;
+
+        const errorMsg = "Employee ID or Email already exists";
+
         results.errors.push({
-          row: i + 2,
+          row: rowNumber,
           employeeId: row.employeeId,
-          error: 'Employee ID or Email already exists'
+          error: errorMsg,
         });
+
+        rowResult.Status = "Failed";
+        rowResult.Remark = errorMsg;
+        results.data.push(rowResult);
+
         continue;
       }
 
-      // Create employee
+      // ✅ Create employee
       await Employee.create({
         employeeId: row.employeeId,
         fullName: row.fullName,
@@ -129,22 +168,35 @@ const processEmployees = async (employees, uploadLogId) => {
         dateOfBirth: row.dateOfBirth,
         dateOfJoining: row.dateOfJoining,
         department: row.department,
-        status: row.status || 'Active'
+        status: row.status || "Active",
       });
 
       results.success++;
+
+      rowResult.Status = "Success";
+      rowResult.Remark = "";
+      results.data.push(rowResult);
+
     } catch (error) {
       results.failed++;
+
+      const errorMsg = error.message;
+
       results.errors.push({
-        row: i + 2,
-        employeeId: employees[i].employeeId || 'N/A',
-        error: error.message
+        row: rowNumber,
+        employeeId: row.employeeId || "N/A",
+        error: errorMsg,
       });
+
+      rowResult.Status = "Failed";
+      rowResult.Remark = errorMsg;
+      results.data.push(rowResult);
     }
   }
 
   return results;
 };
+
 
 const getUploadLogs = async (req, res) => {
   try {

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
 import api from '../services/api';
 import { format } from 'date-fns';
@@ -32,6 +32,9 @@ const Reports = () => {
   const handleSearch = () => {
     refetch();
   };
+  useEffect(()=>{
+    refetch();
+  },[filters])
 
   const handleExport = async () => {
     try {
@@ -126,14 +129,14 @@ const Reports = () => {
               <option value="Pending">Pending</option>
             </select>
           </div>
-          <div className="flex items-end">
+          {/* <div className="flex items-end">
             <button
               onClick={handleSearch}
               className="w-full bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
             >
               Search
             </button>
-          </div>
+          </div> */}
         </div>
       </div>
 
@@ -154,8 +157,8 @@ const Reports = () => {
               <tr>
                 <td colSpan="6" className="px-6 py-4 text-center">Loading...</td>
               </tr>
-            ) : reports?.length > 0 ? (
-              reports.map((report) => (
+            ) : reports?.reports.length > 0 ? (
+              reports?.reports.map((report) => (
                 <tr key={report.id}>
                   <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-sm">
                     {report.employee?.fullName || 'N/A'}

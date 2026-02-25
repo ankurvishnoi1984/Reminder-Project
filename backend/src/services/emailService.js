@@ -14,7 +14,7 @@ const initializeEmailService = () => {
   });
 };
 
-const sendEmail = async (to, subject, body) => {
+const sendEmail = async (to, subject, body,attachments) => {
   try {
     if (!transporter) {
       initializeEmailService();
@@ -24,7 +24,8 @@ const sendEmail = async (to, subject, body) => {
       from: process.env.SMTP_FROM,
       to: to,
       subject: subject,
-      html: body
+      html: body,
+      attachments:attachments
     };
 
     const info = await transporter.sendMail(mailOptions);

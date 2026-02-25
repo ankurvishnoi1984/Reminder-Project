@@ -1,4 +1,6 @@
 const express = require('express');
+
+const { templateUpload } = require('../middleware/upload');
 const router = express.Router();
 const {
   getAllTemplates,
@@ -11,8 +13,8 @@ const { authenticate, authorize } = require('../middleware/auth');
 
 router.get('/', authenticate, authorize('admin'), getAllTemplates);
 router.get('/:id', authenticate, authorize('admin'), getTemplateById);
-router.post('/', authenticate, authorize('admin'), createTemplate);
-router.put('/:id', authenticate, authorize('admin'), updateTemplate);
+router.post('/', authenticate, authorize('admin'), templateUpload.array('attachments', 5), createTemplate);
+router.put('/:id', authenticate, authorize('admin'),templateUpload.array('attachments', 5), updateTemplate);
 router.delete('/:id', authenticate, authorize('admin'), deleteTemplate);
 
 module.exports = router;

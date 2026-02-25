@@ -22,6 +22,17 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
+const templateStorate = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'uploads/templates/');
+  },
+  filename: (req, file, cb) => {
+    const uniqueName =
+      Date.now() + '-' + file.originalname.replace(/\s+/g, '_');
+    cb(null, uniqueName);
+  }
+});
+
 const upload = multer({
   storage: storage,
   fileFilter: fileFilter,
@@ -30,4 +41,9 @@ const upload = multer({
   }
 });
 
-module.exports = upload;
+const templateUpload = multer({
+  storage:templateStorate,
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
+});
+
+module.exports = {upload,templateUpload};

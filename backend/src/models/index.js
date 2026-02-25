@@ -7,6 +7,7 @@ const FestivalMaster = require('./FestivalMaster');
 const Notification = require('./Notification');
 const BulkUploadLog = require('./BulkUploadLog');
 const ErrorLog = require('./ErrorLog');
+const TemplateAttachment = require('./TemplateAttachment');
 
 // Associations
 Employee.hasMany(Notification, { foreignKey: 'employeeId', as: 'notifications' });
@@ -21,12 +22,23 @@ ErrorLog.belongsTo(User, { foreignKey: 'userId', as: 'user' });
 User.hasMany(ErrorLog, { foreignKey: 'resolvedBy', as: 'resolvedErrorLogs' });
 ErrorLog.belongsTo(User, { foreignKey: 'resolvedBy', as: 'resolver' });
 
+
+Template.hasMany(TemplateAttachment, {
+  foreignKey: 'templateId',
+  as: 'attachments',
+});
+
+TemplateAttachment.belongsTo(Template, {
+  foreignKey: 'templateId',
+});
+
 module.exports = {
   sequelize,
   User,
   Employee,
   Event,
   Template,
+  TemplateAttachment,
   FestivalMaster,
   Notification,
   BulkUploadLog,

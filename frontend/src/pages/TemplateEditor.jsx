@@ -13,6 +13,8 @@ const TemplateEditor = () => {
     body: '',
     isActive: true
   });
+  const [attachments, setAttachments] = useState([]);
+  const [existingAttachments, setExistingAttachments] = useState([]);
   const queryClient = useQueryClient();
 
   const { data: templates, isLoading } = useQuery('templates', async () => {
@@ -21,7 +23,9 @@ const TemplateEditor = () => {
   });
 
   const createMutation = useMutation(
-    (data) => api.post('/templates', data),
+    (data) => api.post('/templates', data, {
+      headers: { "Content-Type": "multipart/form-data" },
+    }),
     {
       onSuccess: () => {
         queryClient.invalidateQueries('templates');
@@ -36,7 +40,9 @@ const TemplateEditor = () => {
   );
 
   const updateMutation = useMutation(
-    ({ id, data }) => api.put(`/templates/${id}`, data),
+    ({ id, data }) => api.put(`/templates/${id}`, data, {
+      headers: { "Content-Type": "multipart/form-data" },
+    }),
     {
       onSuccess: () => {
         queryClient.invalidateQueries('templates');
@@ -63,6 +69,17 @@ const TemplateEditor = () => {
     }
   );
 
+  /* const resetForm = () => {
+     setFormData({
+       eventType: 'Birthday',
+       channel: 'Email',
+       subject: '',
+       body: '',
+       isActive: true
+     });
+     setEditingTemplate(null);
+   };*/
+
   const resetForm = () => {
     setFormData({
       eventType: 'Birthday',
@@ -71,10 +88,38 @@ const TemplateEditor = () => {
       body: '',
       isActive: true
     });
+    setAttachments([]);
+    setExistingAttachments([]);
     setEditingTemplate(null);
   };
 
-  const handleEdit = (template) => {
+  const handleFileChange = (e) => {
+    const files = Array.from(e.target.files);
+
+    // basic validation
+    const allowedTypes = [
+      "application/pdf",
+      "image/png",
+      "image/jpeg",
+      "image/jpg",
+    ];
+
+    const validFiles = files.filter((file) =>
+      allowedTypes.includes(file.type)
+    );
+
+    if (validFiles.length !== files.length) {
+      toast.error("Only PDF and Image files are allowed");
+    }
+
+    setAttachments((prev) => [...prev, ...validFiles]);
+  };
+
+  const removeAttachment = (index) => {
+    setAttachments((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  /*const handleEdit = (template) => {
     setEditingTemplate(template);
     setFormData({
       eventType: template.eventType,
@@ -84,14 +129,55 @@ const TemplateEditor = () => {
       isActive: template.isActive
     });
     setShowModal(true);
+  };*/
+
+  const handleEdit = (template) => {
+    setEditingTemplate(template);
+    setExistingAttachments(template.attachments || []);
+    setAttachments([]);
+
+    setFormData({
+      eventType: template.eventType,
+      channel: template.channel,
+      subject: template.subject || '',
+      body: template.body,
+      isActive: template.isActive
+    });
+
+    setShowModal(true);
   };
 
-  const handleSubmit = (e) => {
+  /*const handleSubmit = (e) => {
     e.preventDefault();
     if (editingTemplate) {
       updateMutation.mutate({ id: editingTemplate.id, data: formData });
     } else {
       createMutation.mutate(formData);
+    }
+  };*/
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    const formDataToSend = new FormData();
+
+    // append template fields
+    Object.keys(formData).forEach((key) => {
+      formDataToSend.append(key, formData[key]);
+    });
+
+    // append files
+    attachments.forEach((file) => {
+      formDataToSend.append("attachments", file);
+    });
+
+    if (editingTemplate) {
+      updateMutation.mutate({
+        id: editingTemplate.id,
+        data: formDataToSend,
+      });
+    } else {
+      createMutation.mutate(formDataToSend);
     }
   };
 
@@ -213,6 +299,38 @@ const TemplateEditor = () => {
                   Active
                 </label>
               </div>
+              <div className="mb-4">
+                <label className="block text-sm font-medium mb-1">
+                  Attachments (PDF/Image)
+                </label>
+
+                <input
+                  type="file"
+                  multiple
+                  accept=".pdf,image/*"
+                  onChange={handleFileChange}
+                  className="w-full px-3 py-2 border rounded-md"
+                />
+
+                <p className="text-xs text-gray-500 mt-1">
+                  Max 5 files • PDF, JPG, PNG
+                </p>
+              </div>
+              {existingAttachments.length > 0 && (
+                <div className="mb-4">
+                  <p className="text-sm font-medium mb-2">Existing Attachments</p>
+                  <div className="space-y-2">
+                    {existingAttachments.map((file) => (
+                      <div
+                        key={file.id}
+                        className="flex justify-between items-center bg-blue-50 px-3 py-2 rounded"
+                      >
+                        <span className="text-sm truncate">{file.fileName}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
               <div className="flex justify-end gap-2">
                 <button
                   type="button"

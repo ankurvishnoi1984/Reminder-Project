@@ -8,7 +8,7 @@ const moment = require('moment');
 const templateCache = new Map();
 const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
-const replacePlaceholders = (template, employee, eventData = {}) => {
+const replacePlaceholdersText = (template, employee, eventData = {}) => {
   let message = template.body;
   let subject = template.subject || '';
 
@@ -25,7 +25,34 @@ const replacePlaceholders = (template, employee, eventData = {}) => {
     message = message.replace(/{FestivalName}/g, eventData.festivalName);
   }
 
-  return { subject, body: message };
+  return { subject, textBody: message };
+};
+
+const replacePlaceholdersMail = (template, employee, eventData = {}) => {
+  let subject = template?.subject ?? '';
+  let body = template?.body ?? '';
+
+  // 🔥 ensure strings (VERY IMPORTANT)
+  subject = String(subject);
+  body = String(body);
+
+  const replacements = {
+    EmployeeName: employee?.fullName ?? '',
+    YearsCompleted: eventData?.yearsCompleted ?? '',
+    FestivalName: eventData?.festivalName ?? '',
+  };
+
+  const replaceFn = (text) =>
+    text.replace(/{(.*?)}/g, (match, key) => {
+      return replacements[key] !== undefined
+        ? replacements[key]
+        : match; // keep original placeholder if not found
+    });
+
+  return {
+    subject: replaceFn(subject),
+    mailBody: replaceFn(body),
+  };
 };
 
 
@@ -33,7 +60,7 @@ const replacePlaceholders = (template, employee, eventData = {}) => {
 const getTemplate = async (eventType, channel) => {
   const cacheKey = `${eventType}_${channel}`;
   const cached = templateCache.get(cacheKey);
-  
+
   if (cached && (Date.now() - cached.timestamp < CACHE_TTL)) {
     return cached.template;
   }
@@ -60,25 +87,29 @@ const clearTemplateCache = () => {
 
 const sendNotification = async (employee, eventType, channel, template, eventData = {}) => {
   try {
-    const { subject, body } = replacePlaceholders(template, employee, eventData);
-    
+    const { subject, mailBody } = replacePlaceholdersMail(template, employee, eventData);
+    const { textSubject, textBody } = replacePlaceholdersText(template, employee, eventData);
+    const attachments = template.attachments?.map(file => ({
+      filename: file.fileName,
+      path: file.filePath
+    }));
     let result;
     const startTime = Date.now();
-    
+
     switch (channel) {
       case 'Email':
-        result = await sendEmail(employee.email, subject, body);
+        result = await sendEmail(employee.email, subject, mailBody,attachments);
         break;
-      case 'SMS':
-        result = await sendSMS(employee.mobileNumber, body);
-        break;
-      case 'WhatsApp':
-        result = await sendWhatsApp(employee.whatsappNumber || employee.mobileNumber, body);
-        break;
+      /* case 'SMS':
+         result = await sendSMS(employee.mobileNumber, textBody);
+         break;
+       case 'WhatsApp':
+         result = await sendWhatsApp(employee.whatsappNumber || employee.mobileNumber, textBody);
+         break;*/
       default:
-        result = { success: false, error: 'Invalid channel' };
+        result = { success: false, error: 'Invalid channel', channel };
     }
-    
+
     const duration = Date.now() - startTime;
     if (process.env.NODE_ENV === 'development') {
       console.log(`[${channel}] Sent to ${employee.fullName} (${employee.employeeId}): ${result.success ? 'SUCCESS' : 'FAILED'} (${duration}ms)`);
@@ -112,7 +143,7 @@ const processReminders = async () => {
   try {
     const today = moment().format('YYYY-MM-DD');
     const events = await Event.findAll({ where: { isEnabled: true } });
-    
+
     for (const event of events) {
       if (event.eventType === 'Birthday') {
         await processBirthdayReminders(event, today);
@@ -129,9 +160,9 @@ const processReminders = async () => {
 
 const processBirthdayReminders = async (event, today) => {
   const reminderDates = event.reminderDays || [0];
-  
+
   // Fetch active employees once
-  const activeEmployees = await Employee.findAll({ 
+  const activeEmployees = await Employee.findAll({
     where: { status: 'Active' },
     attributes: ['id', 'fullName', 'email', 'mobileNumber', 'whatsappNumber', 'dateOfBirth']
   });
@@ -139,7 +170,7 @@ const processBirthdayReminders = async (event, today) => {
   // Pre-load templates for all channels
   const templates = {};
   const channelsToProcess = [];
-  
+
   for (const channel of event.channels || []) {
     templates[channel] = await getTemplate('Birthday', channel);
     if (templates[channel]) {
@@ -189,9 +220,9 @@ const processBirthdayReminders = async (event, today) => {
 
 const processAnniversaryReminders = async (event, today) => {
   const reminderDates = event.reminderDays || [0];
-  
+
   // Fetch active employees once
-  const activeEmployees = await Employee.findAll({ 
+  const activeEmployees = await Employee.findAll({
     where: { status: 'Active' },
     attributes: ['id', 'fullName', 'email', 'mobileNumber', 'whatsappNumber', 'dateOfJoining']
   });
@@ -199,7 +230,7 @@ const processAnniversaryReminders = async (event, today) => {
   // Pre-load templates for all channels
   const templates = {};
   const channelsToProcess = [];
-  
+
   for (const channel of event.channels || []) {
     templates[channel] = await getTemplate('JobAnniversary', channel);
     if (templates[channel]) {
@@ -224,7 +255,7 @@ const processAnniversaryReminders = async (event, today) => {
     for (const daysBefore of reminderDates) {
       const reminderDate = moment(anniversaryDate).subtract(daysBefore, 'days').format('YYYY-MM-DD');
 
-      console.log("REMINDER DATE, TODAY",reminderDate,today)
+      console.log("REMINDER DATE, TODAY", reminderDate, today)
 
       if (reminderDate === today) {
         console.log("REMINDER DATE'S TODAY")
@@ -236,11 +267,11 @@ const processAnniversaryReminders = async (event, today) => {
             notificationPromises.push(
               sendNotification(employee, 'JobAnniversary', channel, template, eventData)
             );
-          }else{
+          } else {
             console.log("TEMPLATE NOT FOUND")
           }
         }
-      }else{
+      } else {
         console.log("NOW JOB ANNIVERSARY TODAY")
       }
     }
@@ -256,15 +287,15 @@ const processAnniversaryReminders = async (event, today) => {
 
 const processFestivalReminders = async (event, today) => {
   const reminderDates = event.reminderDays || [0];
-  
+
   // Fetch festivals once
-  const festivals = await FestivalMaster.findAll({ 
+  const festivals = await FestivalMaster.findAll({
     where: { isActive: true },
     attributes: ['id', 'festivalName', 'festivalDate']
   });
 
   // Fetch active employees once
-  const activeEmployees = await Employee.findAll({ 
+  const activeEmployees = await Employee.findAll({
     where: { status: 'Active' },
     attributes: ['id', 'fullName', 'email', 'mobileNumber', 'whatsappNumber']
   });
@@ -272,7 +303,7 @@ const processFestivalReminders = async (event, today) => {
   // Pre-load templates for all channels
   const templates = {};
   const channelsToProcess = [];
-  
+
   for (const channel of event.channels || []) {
     templates[channel] = await getTemplate('Festival', channel);
     if (templates[channel]) {
@@ -364,6 +395,7 @@ module.exports = {
   processBirthdayRemindersOnly,
   processAnniversaryRemindersOnly,
   processFestivalRemindersOnly,
-  replacePlaceholders,
+  replacePlaceholdersMail,
+  replacePlaceholdersText,
   clearTemplateCache
 };

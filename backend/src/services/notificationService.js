@@ -1,4 +1,4 @@
-const { Employee, Template, Notification, Event, FestivalMaster } = require('../models');
+const { Employee, Template, Notification, Event, FestivalMaster, TemplateAttachment } = require('../models');
 const { sendEmail } = require('./emailService');
 const { sendSMS } = require('./smsService');
 const { sendWhatsApp } = require('./whatsappService');
@@ -70,7 +70,12 @@ const getTemplate = async (eventType, channel) => {
       eventType: eventType,
       channel: channel,
       isActive: true
-    }
+    },include: [
+      {
+        model: TemplateAttachment,
+        as: 'attachments',
+      },
+    ],
   });
 
   if (template) {
@@ -92,7 +97,7 @@ const sendNotification = async (employee, eventType, channel, template, eventDat
     const attachments = template.attachments?.map(file => ({
       filename: file.fileName,
       path: file.filePath
-    }));
+    }))||[];
     let result;
     const startTime = Date.now();
 

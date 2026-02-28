@@ -57,45 +57,73 @@ const Reports = () => {
     }
   };
 
-  return (
-    <div>
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-        <h1 className="text-2xl sm:text-3xl font-bold">Reports</h1>
-        <button
-          onClick={handleExport}
-          className="w-full sm:w-auto bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700"
-        >
-          Export CSV
-        </button>
+return (
+  <div className="space-y-6">
+    {/* ===== Header ===== */}
+    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <h1 className="text-3xl font-bold text-slate-900">Reports</h1>
+
+      <button
+        onClick={handleExport}
+        className="
+          bg-gradient-to-r from-emerald-600 to-emerald-500
+          text-white px-5 py-2.5 rounded-xl
+          shadow-md hover:shadow-lg
+          hover:from-emerald-700 hover:to-emerald-600
+          transition-all
+        "
+      >
+        Export CSV
+      </button>
+    </div>
+
+    {/* ================= FILTER CARD ================= */}
+    <div className="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden">
+      {/* card header */}
+      <div className="px-6 py-4 bg-gradient-to-r from-[#0b1735] to-[#1b3e97]">
+        <h2 className="text-white font-semibold tracking-wide">
+          Filters
+        </h2>
       </div>
 
-      <div className="bg-white p-4 sm:p-6 rounded-lg shadow mb-6">
-        <h2 className="text-lg sm:text-xl font-bold mb-4">Filters</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      {/* card body */}
+      <div className="p-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+          {/* Start Date */}
           <div>
-            <label className="block text-sm font-medium mb-1">Start Date</label>
+            <label className="label-modern">Start Date</label>
             <input
               type="date"
               value={filters.startDate}
-              onChange={(e) => handleFilterChange('startDate', e.target.value)}
-              className="w-full px-3 py-2 border rounded-md"
+              onChange={(e) =>
+                handleFilterChange("startDate", e.target.value)
+              }
+              className="input-modern"
             />
           </div>
+
+          {/* End Date */}
           <div>
-            <label className="block text-sm font-medium mb-1">End Date</label>
+            <label className="label-modern">End Date</label>
             <input
               type="date"
               value={filters.endDate}
-              onChange={(e) => handleFilterChange('endDate', e.target.value)}
-              className="w-full px-3 py-2 border rounded-md"
+              onChange={(e) =>
+                handleFilterChange("endDate", e.target.value)
+              }
+              className="input-modern"
             />
           </div>
+
+          {/* Event Type */}
           <div>
-            <label className="block text-sm font-medium mb-1">Event Type</label>
+            <label className="label-modern">Event Type</label>
             <select
               value={filters.eventType}
-              onChange={(e) => handleFilterChange('eventType', e.target.value)}
-              className="w-full px-3 py-2 border rounded-md"
+              onChange={(e) =>
+                handleFilterChange("eventType", e.target.value)
+              }
+              className="input-modern"
             >
               <option value="">All</option>
               <option value="Birthday">Birthday</option>
@@ -103,12 +131,16 @@ const Reports = () => {
               <option value="Festival">Festival</option>
             </select>
           </div>
+
+          {/* Channel */}
           <div>
-            <label className="block text-sm font-medium mb-1">Channel</label>
+            <label className="label-modern">Channel</label>
             <select
               value={filters.channel}
-              onChange={(e) => handleFilterChange('channel', e.target.value)}
-              className="w-full px-3 py-2 border rounded-md"
+              onChange={(e) =>
+                handleFilterChange("channel", e.target.value)
+              }
+              className="input-modern"
             >
               <option value="">All</option>
               <option value="Email">Email</option>
@@ -116,12 +148,16 @@ const Reports = () => {
               <option value="SMS">SMS</option>
             </select>
           </div>
+
+          {/* Status */}
           <div>
-            <label className="block text-sm font-medium mb-1">Status</label>
+            <label className="label-modern">Status</label>
             <select
               value={filters.status}
-              onChange={(e) => handleFilterChange('status', e.target.value)}
-              className="w-full px-3 py-2 border rounded-md"
+              onChange={(e) =>
+                handleFilterChange("status", e.target.value)
+              }
+              className="input-modern"
             >
               <option value="">All</option>
               <option value="Success">Success</option>
@@ -129,69 +165,100 @@ const Reports = () => {
               <option value="Pending">Pending</option>
             </select>
           </div>
-          {/* <div className="flex items-end">
-            <button
-              onClick={handleSearch}
-              className="w-full bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
-            >
-              Search
-            </button>
-          </div> */}
         </div>
       </div>
+    </div>
 
-      <div className="bg-white rounded-lg shadow overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Employee</th>
-              <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Event Type</th>
-              <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase hidden sm:table-cell">Channel</th>
-              <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-              <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase hidden md:table-cell">Sent At</th>
-              <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase hidden lg:table-cell">Response</th>
+    {/* ================= TABLE ================= */}
+    <div className="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden">
+      <div className="overflow-x-auto">
+        <table className="w-full text-sm">
+          <thead className="bg-gradient-to-b from-[#2c498d] to-[#0b1735] text-white border-b border-slate-200">
+            <tr className=" uppercase text-xs tracking-wider">
+              <th className="px-6 py-3 text-left">Employee</th>
+              <th className="px-6 py-3 text-left">Event Type</th>
+              <th className="px-6 py-3 text-left hidden sm:table-cell">
+                Channel
+              </th>
+              <th className="px-6 py-3 text-left">Status</th>
+              <th className="px-6 py-3 text-left hidden md:table-cell">
+                Sent At
+              </th>
+              <th className="px-6 py-3 text-left hidden lg:table-cell">
+                Response
+              </th>
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
+
+          <tbody>
             {isLoading ? (
               <tr>
-                <td colSpan="6" className="px-6 py-4 text-center">Loading...</td>
+                <td colSpan="6" className="py-10 text-center text-slate-500">
+                  Loading...
+                </td>
               </tr>
-            ) : reports?.reports.length > 0 ? (
-              reports?.reports.map((report) => (
-                <tr key={report.id}>
-                  <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-sm">
-                    {report.employee?.fullName || 'N/A'}
+            ) : reports?.reports?.length > 0 ? (
+              reports.reports.map((report, index) => (
+                <tr
+                  key={report.id}
+                  className={`
+                    border-t border-slate-100
+                    hover:bg-indigo-50/40
+                    transition
+                    ${index % 2 === 0 ? "bg-white" : "bg-slate-50/40"}
+                  `}
+                >
+                  <td className="px-6 py-4 font-medium text-slate-900">
+                    {report.employee?.fullName || "N/A"}
                   </td>
-                  <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-sm">{report.eventType}</td>
-                  <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-sm hidden sm:table-cell">{report.channel}</td>
-                  <td className="px-3 sm:px-6 py-4 whitespace-nowrap">
-                    <span className={`px-2 py-1 text-xs rounded ${
-                      report.status === 'Success' ? 'bg-green-100 text-green-800' :
-                      report.status === 'Failed' ? 'bg-red-100 text-red-800' :
-                      'bg-yellow-100 text-yellow-800'
-                    }`}>
+
+                  <td className="px-6 py-4">{report.eventType}</td>
+
+                  <td className="px-6 py-4 hidden sm:table-cell">
+                    {report.channel}
+                  </td>
+
+                  <td className="px-6 py-4">
+                    <span
+                      className={`status-pill ${
+                        report.status === "Success"
+                          ? "status-success"
+                          : report.status === "Failed"
+                          ? "status-failed"
+                          : "status-pending"
+                      }`}
+                    >
                       {report.status}
                     </span>
                   </td>
-                  <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-sm hidden md:table-cell">
-                    {report.sentAt ? format(new Date(report.sentAt), 'yyyy-MM-dd HH:mm') : 'N/A'}
+
+                  <td className="px-6 py-4 hidden md:table-cell">
+                    {report.sentAt
+                      ? format(
+                          new Date(report.sentAt),
+                          "yyyy-MM-dd HH:mm"
+                        )
+                      : "N/A"}
                   </td>
-                  <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-600 hidden lg:table-cell">
-                    {report.responseMessage || 'N/A'}
+
+                  <td className="px-6 py-4 text-slate-600 hidden lg:table-cell truncate max-w-xs">
+                    {report.responseMessage || "N/A"}
                   </td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan="6" className="px-6 py-4 text-center">No reports found</td>
+                <td colSpan="6" className="py-12 text-center text-slate-500">
+                  No reports found
+                </td>
               </tr>
             )}
           </tbody>
         </table>
       </div>
     </div>
-  );
+  </div>
+);
 };
 
 export default Reports;
